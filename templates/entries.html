@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dilse.ai - Your Journal</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="{{ url_for('static', filename='diary.js') }}"></script>
+    <style>
+        :root {
+            --bg-color: #0c0908;
+            --accent-gold: #d4af37;
+            --text-main: #fcf9f2;
+            --text-dim: #a08a70;
+            --glass-bg: rgba(28, 20, 15, 0.6);
+            --glass-border: rgba(160, 138, 112, 0.15);
+            --shadow-gold: 0 10px 40px rgba(212, 175, 55, 0.1);
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Bokeh Background */
+        .bokeh-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #1a1412 0%, #0c0908 100%);
+        }
+
+        .bokeh {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.1;
+        }
+
+        header {
+            padding: 4rem 1rem 2rem;
+            text-align: center;
+            position: relative;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
+            font-weight: 700;
+            background: linear-gradient(to bottom, #fff, #d4af37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--accent-gold);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-gold);
+            color: #000;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        main {
+            padding: 2rem 1rem 5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .entries-container {
+            display: grid;
+            gap: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        }
+
+        .entry-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: slideUp 0.6s ease-out both;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .entry-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(212, 175, 55, 0.3);
+            box-shadow: var(--shadow-gold);
+        }
+
+        .entry-date {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .entry-text {
+            font-size: 1rem;
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+            opacity: 0.9;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .entry-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .mood-badge {
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.05);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--glass-border);
+            background: transparent;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .action-btn:hover {
+            background: var(--accent-gold);
+            color: #000;
+            border-color: var(--accent-gold);
+        }
+
+        .delete-btn:hover {
+            background: var(--danger);
+            color: #fff;
+            border-color: var(--danger);
+        }
+
+        /* Modal Redesign */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: #15110f;
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            width: 100%;
+            max-width: 700px;
+            padding: 3rem;
+            animation: modalIn 0.4s cubic-bezier(0.2, 1, 0.2, 1);
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--accent-gold);
+            margin-bottom: 1.5rem;
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            outline: none;
+            resize: none;
+        }
+
+        textarea:focus {
+            border-color: var(--accent-gold);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 0.8rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn {
+            background: var(--accent-gold);
+            color: #000;
+        }
+
+        .cancel-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-dim);
+            border: 1px solid var(--glass-border);
+        }
+
+        .no-entries {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 5rem 2rem;
+            color: var(--text-dim);
+        }
+
+        .no-entries i {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.2;
+        }
+
+        @media (max-width: 640px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .modal-content {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bokeh-overlay">
+        <div class="bokeh" style="width: 400px; height: 400px; background: #2a1f1a; left: -10%; top: -10%;"></div>
+        <div class="bokeh" style="width: 300px; height: 300px; background: #1e1a15; right: 0; bottom: 0;"></div>
+    </div>
+
+    <header>
+        <button class="back-btn" onclick="window.location.href='/'">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h1>Journal Entries</h1>
+    </header>
+
+    <main>
+        <div class="entries-container" id="entriesContainer">
+            <!-- Entries will be loaded here -->
+        </div>
+    </main>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h2>Refine your entry</h2>
+            <input type="hidden" id="editDate">
+            <textarea id="editText"></textarea>
+            <div class="modal-actions">
+                <button class="modal-btn cancel-btn" onclick="closeEditModal()">Discard</button>
+                <button class="modal-btn save-btn" onclick="submitEdit()">Save Revision</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allEntries = [];
+
+        function loadEntries() {
+            fetch('/get_entries')
+                .then(response => response.json())
+                .then(entries => {
+                    allEntries = entries;
+                    const container = document.getElementById('entriesContainer');
+
+                    if (entries.length === 0) {
+                        container.innerHTML = `
+                            <div class="no-entries">
+                                <i class="fas fa-feather-pointed"></i>
+                                <h2>Your story begins here</h2>
+                                <p>Capture your first memory to see it preserved in this space.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                    container.innerHTML = entries.map((entry, index) => {
+                        const dateObj = new Date(entry.date);
+                        const formattedDate = dateObj.toLocaleDateString('en-US', {
+                            month: 'short', day: 'numeric', year: 'numeric'
+                        });
+
+                        return `
+                            <div class="entry-card" style="animation-delay: ${index * 0.1}s">
+                                <div class="entry-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    ${formattedDate}
+                                </div>
+                                <div class="entry-text">${entry.text}</div>
+                                <div class="entry-footer">
+                                    <div class="mood-badge">${entry.mood || '😐'}</div>
+                                    <div class="actions">
+                                        <button class="action-btn" onclick="openEditModal('${entry.date}')" title="Edit">
+                                            <i class="fas fa-pen-nib"></i>
+                                        </button>
+                                        <button class="action-btn delete-btn" onclick="deleteEntry('${entry.date}')" title="Remove">
+                                            <i class="far fa-trash-can"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                });
+        }
+
+        function openEditModal(date) {
+            const entry = allEntries.find(e => e.date === date);
+            if (!entry) return;
+            document.getElementById('editDate').value = date;
+            document.getElementById('editText').value = entry.text;
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function submitEdit() {
+            const date = document.getElementById('editDate').value;
+            const text = document.getElementById('editText').value;
+
+            fetch('/edit_entry', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ date, text })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        closeEditModal();
+                        loadEntries();
+                    } else {
+                        alert(data.message);
+                    }
+                });
+        }
+
+        function deleteEntry(date) {
+            if (confirm('Preserve this entry? It will be permanently removed from your history.')) {
+                fetch('/delete_entry', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ date })
+                })
+                    .then(() => loadEntries());
+            }
+        }
+
+        window.addEventListener('load', loadEntries);
+    </script>
+</body>
+
+</html>

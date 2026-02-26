@@ -1,0 +1,115 @@
+/* General Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to bottom, #f0f4f8, #d9e8f5);
+    color: #2c3e50;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header Styling */
+header {
+    background-color: #5b5253;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+header p {
+    margin: 8px 0 0;
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+/* Container Styling */
+.container {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    margin: 30px auto;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+form label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+input[type="url"], select {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 12px 25px;
+    font-size: 1rem;
+    color: white;
+    background: #5b5253;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: #7e6d6f;
+    transform: translateY(-2px);
+}
+
+/* Results and Loading Message */
+#error-message, #loading {
+    margin: 15px 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #e74c3c;
+}
+
+.results {
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    padding: 20px;
+    margin-top: 20px;
+    text-align: left;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    line-height: 25px;
+}
+
+.results h3 {
+    margin: 0 0 10px;
+    color: #34495e;
+}
+
+/* Footer Styling */
+footer {
+    text-align: center;
+    padding: 15px;
+    font-size: 0.9rem;
+    background-color: #5b5253;
+    color: white;
+    margin-top: auto;
+}
+
+/* Emoji Styling for Sentiments */
+.emoji {
+    font-size: 2rem;
+    margin: 10px 0;
+}

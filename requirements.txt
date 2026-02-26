@@ -1,0 +1,6 @@
+Flask
+faster-whisper
+celery
+redis
+requests
+werkzeug
